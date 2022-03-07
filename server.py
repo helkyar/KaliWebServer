@@ -16,7 +16,7 @@ except socket.error as msg:
   print('Binding has failed. Error code: ' + str(msg[0]) + ' MSG: ' + msg[1])
   sys.exit()
 
-newSocket.listen(10)
+newSocket.listen(5)
 print('Socket listening')
 
 #Let the server talk with the client
@@ -24,6 +24,8 @@ print('Run: telnet localhost 9090 to connect to this server')
 
 while True:
   connection, address = newSocket.accept()
-  print('Connected with ' + address[0] + ':' + str(address[1]))
+  print('Connected with ', address)
+  connection.send('Thanks for connecting')
+  connection.close()
 
 newSocket.close()
