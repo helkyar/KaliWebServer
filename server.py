@@ -7,13 +7,14 @@ HOST = ''
 PORT = 9090
 
 newSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+newSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
 print('Socket created successfully')
 
 #Bindind socket to local host and port
 try:
   newSocket.bind((HOST, PORT))
 except socket.error as msg:
-  print('Binding has failed. Error code: ' + str(msg[0]) + ' MSG: ' + msg[1])
+  print(f'Binding has failed. Error code: {str(msg[0])} MSG: {msg[1]}')
   sys.exit()
 
 newSocket.listen(5)
@@ -23,9 +24,17 @@ print('Socket listening')
 print('Run: telnet localhost 9090 to connect to this server')
 
 while True:
-  connection, address = newSocket.accept()
+  c, address = newSocket.accept()
+  data = c.recv(512)
   print('Connected with ', address)
-  connection.send('Thanks for connecting')
-  connection.close()
+
+  if data:
+    file = open("store.dat", "+w")
+    print(f'Connection from address : {address[0]}')
+    file.write(address[0])
+    file.write(" : ")
+    file.write(data.decode("utf-8"))
+    file.close()
+    c.close()
 
 newSocket.close()
