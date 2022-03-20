@@ -1,40 +1,32 @@
-#This file will create a server
+#!/usr/bin/python2.7
 import socket
-import sys
 
-#Passing an empty string to make all interfaces avaiable
-HOST = ''
+#creating a socket object
+newSock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# bind this socket object to an IP address and port
+HOST = ""
 PORT = 9090
-
-newSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-newSocket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-print('Socket created successfully')
-
-#Bindind socket to local host and port
 try:
   newSocket.bind((HOST, PORT))
 except socket.error as msg:
   print(f'Binding has failed. Error code: {str(msg[0])} MSG: {msg[1]}')
   sys.exit()
-
-newSocket.listen(5)
-print('Socket listening')
-
+  
 #Let the server talk with the client
 print('Run: telnet localhost 9090 to connect to this server')
 
-while True:
-  c, address = newSocket.accept()
-  data = c.recv(512)
-  print('Connected with ', address)
+newSock.listen(2)
+(client, (ip, sock)) = newSock.accept()
+print("Recieved connection from ", ip)
 
-  if data:
-    file = open("store.dat", "+w")
-    print(f'Connection from address : {address[0]}')
-    file.write(address[0])
-    file.write(" : ")
-    file.write(data.decode("utf-8"))
-    file.close()
-    c.close()
+print ("Starting our ECHO Server object that will echo to the client")
+data = "mock data"
 
-newSocket.close()
+
+while len(data):
+  data = client.recv(2048)
+  print ("Client sent this data : ", data)
+  client.send(data)
+print("Closing our connection after sending data to the client....")
+client.close()
